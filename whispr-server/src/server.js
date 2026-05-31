@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(_dirname, "../whispr-client/dist")))
 
-    app.get("*", (_, res) => {
+    app.get("*splat", (_, res) => {
         res.sendFile(path.resolve(_dirname, "../whispr-client", "dist", "index.html"))
     })
 }
