@@ -1,0 +1,13 @@
+{
+    "name": "whispr-app",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "build": "npm install --prefix whispr-server && npm install --prefix whispr-client && npm run build --prefix whispr-client",
+        "start": "npm run start --prefix whispr-server"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": ""
+}
