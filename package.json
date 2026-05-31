@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
-        "build": "npm install --prefix whispr-server && npm install --prefix whispr-client && npm run build --prefix whispr-client",
+        "build": "npm install --production=false --prefix whispr-server && npm install --production=false --prefix whispr-client && npm run build --prefix whispr-client",
         "start": "npm run start --prefix whispr-server"
     },
     "keywords": [],
