@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+import { Resend } from "resend";
 
 const welcomeHtml = (fullName) => `
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f0f0;padding:32px 0;">
@@ -37,7 +37,7 @@ const welcomeHtml = (fullName) => `
           </p>
           <table cellpadding="0" cellspacing="0">
             <tr><td style="background:#6c63ff;border-radius:10px;">
-              <a href="${process.env.CLIENT_URL || '#'}" style="display:block;padding:13px 28px;color:#fff;text-decoration:none;font-size:14px;font-weight:600;">Open Whispr →</a>
+              <a href="${process.env.CLIENT_URL || "#"}" style="display:block;padding:13px 28px;color:#fff;text-decoration:none;font-size:14px;font-weight:600;">Open Whispr →</a>
             </td></tr>
           </table>
         </td>
@@ -93,7 +93,7 @@ const loginHtml = (fullName, loginTime) => `
           </p>
           <table cellpadding="0" cellspacing="0">
             <tr><td style="background:#dc2626;border-radius:10px;">
-              <a href="${process.env.CLIENT_URL || '#'}" style="display:block;padding:13px 28px;color:#fff;text-decoration:none;font-size:14px;font-weight:600;">Secure my account →</a>
+              <a href="${process.env.CLIENT_URL || "#"}" style="display:block;padding:13px 28px;color:#fff;text-decoration:none;font-size:14px;font-weight:600;">Secure my account →</a>
             </td></tr>
           </table>
         </td>
@@ -120,38 +120,35 @@ const getResend = () => {
 };
 
 // Use a verified domain if you have one, otherwise use the testing one resend provides
-const fromEmail = process.env.EMAIL_FROM || 'onboarding@resend.dev'; 
+const fromEmail = process.env.EMAIL_FROM || "onboarding@resend.dev";
 
-/**
- * Send a welcome email to a newly registered user.
- * @param {string} to - recipient email address
- * @param {string} fullName - user's full name
- */
 export const sendWelcomeEmail = async (to, fullName) => {
-
-  await getResend().emails.send({
+  const { error } = await getResend().emails.send({
     from: `Whispr <${fromEmail}>`,
     to: [to],
     subject: "Welcome to Whispr!",
     html: welcomeHtml(fullName),
   });
+
+  if (error) {
+    throw error;
+  }
 };
 
-/**
- * Send a login notification email to an existing user.
- * @param {string} to - recipient email address
- * @param {string} fullName - user's full name
- */
 export const sendLoginEmail = async (to, fullName) => {
   const loginTime = new Date().toLocaleString("en-US", {
     dateStyle: "medium",
     timeStyle: "short",
   });
 
-  await getResend().emails.send({
+  const { error } = await getResend().emails.send({
     from: `Whispr <${fromEmail}>`,
     to: [to],
     subject: "New sign-in to your Whispr account",
     html: loginHtml(fullName, loginTime),
   });
+
+  if (error) {
+    throw error;
+  }
 };
