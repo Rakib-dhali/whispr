@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
 import User from "../models/user.model.js";
 import { generateToken } from "../lib/utils.js";
+import { sendWelcomeEmail, sendLoginEmail } from "../lib/email.js";
+
 export const signup = async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
@@ -33,7 +35,12 @@ export const signup = async (req, res) => {
     });
 
     if (user) {
+      // Send welcome email (non-blocking)
+      sendWelcomeEmail(email, fullName).catch((err) =>
+        console.error("Failed to send welcome email:", err),
+      );
       generateToken(user._id, res);
+
       return res.status(201).json({
         message: "User created successfully",
         user: {
@@ -75,6 +82,12 @@ export const signin = async (req, res) => {
     }
 
     generateToken(user._id, res);
+
+    // Send login notification email (non-blocking)
+    sendLoginEmail(email, user.fullName).catch((err) =>
+      console.error("Failed to send login email:", err),
+    );
+
     return res.status(200).json({
       message: "User signed in successfully",
       user: {
@@ -91,8 +104,10 @@ export const signin = async (req, res) => {
 
 export const signout = (req, res) => {
   try {
-    res.cookie("jwt", "", {
-      maxAge: 0,
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== "development",
+      sameSite: "strict",
     });
     res.status(200).json({ message: "signed out successfully" });
   } catch (error) {
