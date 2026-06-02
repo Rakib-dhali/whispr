@@ -5,13 +5,10 @@ export const protectedRoute = async (req, res, next) => {
   try {
     const token = req.cookies.jwt;
     if (!token) {
-      return res.status(400).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded) {
-      return res.status(400).json({ message: "Unauthorized- Invlaid token" });
-    }
 
     const user = await User.findById(decoded.userId).select("-password");
 
@@ -22,7 +19,13 @@ export const protectedRoute = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    console.log("protectedRoute error:", error);
-    res.status(500).json({ message: "Internal server error" });
+    if (
+      error.name === "TokenExpiredError" ||
+      error.name === "JsonWebTokenError"
+    ) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    console.error("protectedRoute error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };

@@ -117,25 +117,30 @@ export const signout = (req, res) => {
   }
 };
 
-
 export const updateProfile = async (req, res) => {
   try {
     const { fullName, profilePic } = req.body;
-    if (!fullName || !profilePic) {
-      return res.status(400).json({ message: "All fields are required" });
+    if (!fullName && !profilePic) {
+      return res
+        .status(400)
+        .json({ message: "At least one feild is required" });
     }
 
     const userId = req.user._id;
-    const uploadResult = await cloudinary.uploader.upload(profilePic);
+    const updates = {};
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      {
-        fullName,
-        profilePic: uploadResult.secure_url,
-      },
-      { new: true },
-    );
+    if (typeof fullName === "string" && fullName.trim()) {
+      updates.fullName = fullName.trim();
+    }
+
+    if (profilePic) {
+      const uploadResult = await cloudinary.uploader.upload(profilePic);
+      updates.profilePic = uploadResult.secure_url;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updates, {
+      new: true,
+    });
 
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
@@ -150,13 +155,11 @@ export const updateProfile = async (req, res) => {
         profilePic: updatedUser.profilePic,
       },
     });
-    
   } catch (error) {
     console.error("updateProfile error:", error);
     return res.status(500).json({ message: "Internal server error" });
-    
   }
-}
+};
 
 export const checkUser = async (req, res) => {
   try {
@@ -169,10 +172,8 @@ export const checkUser = async (req, res) => {
         profilePic: req.user.profilePic,
       },
     });
-    
   } catch (error) {
     console.error("checkUser error:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
-}
-  
+};
