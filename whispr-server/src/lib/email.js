@@ -110,7 +110,6 @@ const loginHtml = (fullName, loginTime) => `
   </td></tr>
 </table>`;
 
-// Initialize Resend lazily so it picks up env vars
 let resend;
 const getResend = () => {
   if (!resend) {
@@ -119,7 +118,6 @@ const getResend = () => {
   return resend;
 };
 
-// Use a verified domain if you have one, otherwise use the testing one resend provides
 const fromEmail = process.env.EMAIL_FROM || "onboarding@resend.dev";
 
 export const sendWelcomeEmail = async (to, fullName) => {
