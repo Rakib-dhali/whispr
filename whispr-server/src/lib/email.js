@@ -118,7 +118,7 @@ const getResend = () => {
   return resend;
 };
 
-const fromEmail = process.env.EMAIL_FROM || "onboarding@resend.dev";
+const fromEmail = process.env.EMAIL_FROM || "rakibdhali343@gmail.com";
 
 export const sendWelcomeEmail = async (to, fullName) => {
   const { error } = await getResend().emails.send({

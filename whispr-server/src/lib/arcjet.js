@@ -2,7 +2,6 @@ import arcjet, {
   detectBot,
   shield,
   slidingWindow,
-  tokenBucket,
 } from "@arcjet/node";
 
 const aj = arcjet({
