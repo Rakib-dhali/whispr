@@ -1,4 +1,5 @@
 import aj from "../lib/arcjet.js";
+import {isSpoofedBot} from "@arcjet/inspect"
 
 export const ajProtection = async (req, res, next) => {
   try {
@@ -6,15 +7,16 @@ export const ajProtection = async (req, res, next) => {
 
     if (decision.isDenied()) {
       if (decision.reason.isRateLimit()) {
-        res.writeHead(429, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: "Too many requests" }));
+        return res.status(429).json({message: "rate limit exceeded"})
       } else if (decision.reason.isBot()) {
-        res.writeHead(403, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: "No bots allowed" }));
+        return res.status(403).json({message: "No bots allowed"})
       } else {
-        res.writeHead(403, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: "Forbidden" }));
+        return res.status(403).json({message: "Forbidden"})
       }
+    }
+
+    if (decision.results.some(isSpoofedBot)){
+      return res.status(403).json({message: "Spoofed bot detected"})
     }
 
     next();
