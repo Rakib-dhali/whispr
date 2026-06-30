@@ -1,4 +1,5 @@
-import { Resend } from "resend";
+
+import nodemailer from "nodemailer";
 
 const welcomeHtml = (fullName) => `
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f0f0;padding:32px 0;">
@@ -109,28 +110,23 @@ const loginHtml = (fullName, loginTime) => `
     </table>
   </td></tr>
 </table>`;
-
-let resend;
-const getResend = () => {
-  if (!resend) {
-    resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   }
-  return resend;
-};
-
-const fromEmail = process.env.EMAIL_FROM || "onboarding@resend.dev";
+})
 
 export const sendWelcomeEmail = async (to, fullName) => {
-  const { error } = await getResend().emails.send({
-    from: `Whispr <${fromEmail}>`,
-    to: [to],
+  const mailOptions = {
+    from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+    to: to,
     subject: "Welcome to Whispr!",
     html: welcomeHtml(fullName),
-  });
+  };
 
-  if (error) {
-    throw error;
-  }
+  await transporter.sendMail(mailOptions);
 };
 
 export const sendLoginEmail = async (to, fullName) => {
@@ -139,14 +135,12 @@ export const sendLoginEmail = async (to, fullName) => {
     timeStyle: "short",
   });
 
-  const { error } = await getResend().emails.send({
-    from: `Whispr <${fromEmail}>`,
-    to: [to],
+  const mailOptions = {
+    from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+    to: to,
     subject: "New sign-in to your Whispr account",
     html: loginHtml(fullName, loginTime),
-  });
-
-  if (error) {
-    throw error;
-  }
+  };
+  
+  await transporter.sendMail(mailOptions);
 };
