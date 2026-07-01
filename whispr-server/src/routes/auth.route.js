@@ -5,7 +5,7 @@ import { ajProtection } from "../middlewares/arcjet.middleware.js";
 
 const authRoutes = Router();
 
-authRoutes.use(ajProtection)
+// authRoutes.use(ajProtection)
 
 authRoutes.post("/signup", signup);
 authRoutes.post("/signin", signin);
