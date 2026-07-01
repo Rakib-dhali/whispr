@@ -45,6 +45,12 @@ export const sendMessage = async (req, res) => {
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
 
+    if (!text && !image) {
+      return res
+        .status(400)
+        .json({ message: "Message must contain text or an image" });
+    }
+
     let imageUrl;
     if (image) {
       const uploadedResponse = await cloudinary.uploader.upload(image);
@@ -63,7 +69,7 @@ export const sendMessage = async (req, res) => {
 
     res.status(201).json({
       message: "Message sent successfully",
-      message: newMessage,
+      data: newMessage,
     });
   } catch (error) {
     console.log("Error in sendMessage controller:", error.message);
