@@ -35,8 +35,9 @@ const Signup = () => {
       newErrors.fullName = "Name must be at least 2 characters";
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!form.email.trim()) newErrors.email = "Email is required";
-    else if (!emailRegex.test(form.email))
+    const email = form.email.trim();
+    if (!email) newErrors.email = "Email is required";
+    else if (!emailRegex.test(email))
       newErrors.email = "Enter a valid email address";
 
     if (!form.password) newErrors.password = "Password is required";
@@ -93,7 +94,6 @@ const Signup = () => {
       <div className="w-full max-w-md">
         {/* Card */}
         <div className="rounded-2xl border border-[#E4DCCF] bg-white px-8 py-10 shadow-sm">
-
           <div className="text-center pb-10">
             <h2 className="text-2xl font-bold text-[#1a1a1a] pb-3">
               Create New Account
@@ -102,8 +102,12 @@ const Signup = () => {
               Join Our Realtime Messaging Community
             </p>
           </div>
-          <form id="signup-form" onSubmit={handleSubmit} noValidate className="space-y-5">
-
+          <form
+            id="signup-form"
+            onSubmit={handleSubmit}
+            noValidate
+            className="space-y-5"
+          >
             {/* Full Name */}
             <div>
               <label
@@ -151,28 +155,27 @@ const Signup = () => {
             </div>
 
             {/* Password */}
-              <div>
-                <label
-                  htmlFor="signup-password"
-                  className="mb-1.5 block text-sm font-semibold text-[#1a1a1a]"
-                >
-                  Password
-                </label>
-                <input
-                  id="signup-password"
-                  type="password"
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  placeholder="••••••••"
-                  autoComplete="new-password"
-                  className={`${inputBase} ${errors.password ? inputError : inputNormal}`}
-                />
-                {errors.password && (
-                  <p className="mt-1 text-xs text-red-500">{errors.password}</p>
-                )}
-              </div>
-
+            <div>
+              <label
+                htmlFor="signup-password"
+                className="mb-1.5 block text-sm font-semibold text-[#1a1a1a]"
+              >
+                Password
+              </label>
+              <input
+                id="signup-password"
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                autoComplete="current-password"
+                className={`${inputBase} ${errors.password ? inputError : inputNormal}`}
+              />
+              {errors.password && (
+                <p className="mt-1 text-xs text-red-500">{errors.password}</p>
+              )}
+            </div>
 
             {/* Terms */}
             <p className="text-center text-xs text-[#6b6b64]">
@@ -202,7 +205,11 @@ const Signup = () => {
             >
               {isLoading ? (
                 <>
-                  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <svg
+                    className="h-4 w-4 animate-spin"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
                     <circle
                       className="opacity-25"
                       cx="12"
@@ -220,7 +227,9 @@ const Signup = () => {
                   Creating account…
                 </>
               ) : (
-                <span className="inline-flex items-center">Create Account </span>
+                <span className="inline-flex items-center">
+                  Create Account{" "}
+                </span>
               )}
             </button>
           </form>

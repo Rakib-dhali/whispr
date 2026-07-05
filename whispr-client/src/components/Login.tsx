@@ -28,8 +28,9 @@ const Login = () => {
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!form.email.trim()) newErrors.email = "Email is required";
-    else if (!emailRegex.test(form.email))
+    const email = form.email.trim();
+    if (!email) newErrors.email = "Email is required";
+    else if (!emailRegex.test(email))
       newErrors.email = "Enter a valid email address";
 
     if (!form.password) newErrors.password = "Password is required";
@@ -129,7 +130,7 @@ const Login = () => {
                 value={form.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                autoComplete="new-password"
+                autoComplete="current-password"
                 className={`${inputBase} ${errors.password ? inputError : inputNormal}`}
               />
               {errors.password && (

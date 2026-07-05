@@ -350,12 +350,12 @@ const CTASection: React.FC = () => {
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <a
-              href="#"
+            <Link
+              to="/signup"
               className="rounded-full bg-[#0F3D2E] px-6 py-3 text-sm font-semibold text-white hover:bg-[#0c3025] transition-colors"
             >
               Get Started Now
-            </a>
+            </Link>
             <a
               href="#"
               className="rounded-full border border-[#0F3D2E] bg-white px-6 py-3 text-sm font-semibold text-[#0F3D2E] hover:bg-[#0F3D2E] hover:text-white transition-colors"
