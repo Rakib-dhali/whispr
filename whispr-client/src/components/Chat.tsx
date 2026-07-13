@@ -99,7 +99,9 @@ const Sidebar = () => {
             onClick={() => setSoundEnabled(!soundEnabled)}
             className="rounded-full p-2 text-[#6b6b64] hover:bg-[#EDE7DD] transition-colors cursor-pointer"
             title={soundEnabled ? "Mute typing sound" : "Unmute typing sound"}
-            aria-label={soundEnabled ? "Mute typing sound" : "Unmute typing sound"}
+            aria-label={
+              soundEnabled ? "Mute typing sound" : "Unmute typing sound"
+            }
           >
             {soundEnabled ? (
               <HiSpeakerWave className="h-5 w-5" />
@@ -204,10 +206,11 @@ const ContactItem = ({
 }: ContactItemProps) => (
   <button
     onClick={onSelect}
-    className={`flex w-full cursor-pointer items-center gap-3 px-4 py-3 transition-colors ${isSelected
+    className={`flex w-full cursor-pointer items-center gap-3 px-4 py-3 transition-colors ${
+      isSelected
         ? "bg-[#F4F1EA] border-l-4 border-[#22C55E]"
         : "hover:bg-[#FAFAF5] border-l-4 border-transparent"
-      }`}
+    }`}
   >
     {contact.profilePic ? (
       <img
@@ -298,12 +301,12 @@ const ChatArea = () => {
   const formatDateSeparator = (dateStr: string) => {
     const date = new Date(dateStr);
     const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const oneDay = 86400000;
+    const startOfDay = (d: Date) =>
+      new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    const dayDiff = Math.round((startOfDay(now) - startOfDay(date)) / 86400000);
 
-    if (diff < oneDay && now.getDate() === date.getDate()) return "TODAY";
-    if (diff < oneDay * 2 && now.getDate() - date.getDate() === 1)
-      return "YESTERDAY";
+    if (dayDiff === 0) return "TODAY";
+    if (dayDiff === 1) return "YESTERDAY";
     return date.toLocaleDateString([], {
       weekday: "long",
       month: "short",
@@ -374,8 +377,9 @@ const ChatArea = () => {
                 className={`flex ${i % 2 === 0 ? "justify-start" : "justify-end"} animate-pulse`}
               >
                 <div
-                  className={`h-10 rounded-2xl ${i % 2 === 0 ? "bg-white/60" : "bg-[#22C55E]/20"
-                    }`}
+                  className={`h-10 rounded-2xl ${
+                    i % 2 === 0 ? "bg-white/60" : "bg-[#22C55E]/20"
+                  }`}
                   style={{ width: `${[200, 260, 180, 300, 220][i]}px` }}
                 />
               </div>
@@ -410,17 +414,19 @@ const ChatArea = () => {
                     className={`mb-1.5 flex ${isMine ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`group relative max-w-[65%] rounded-2xl px-3 py-2 shadow-sm transition-all ${isMine
+                      className={`group relative max-w-[65%] rounded-2xl px-3 py-2 shadow-sm transition-all ${
+                        isMine
                           ? "bg-[#D9FDD3] rounded-tr-sm"
                           : "bg-white rounded-tl-sm"
-                        }`}
+                      }`}
                     >
                       {/* Tail */}
                       <div
-                        className={`absolute top-0 h-3 w-3 ${isMine
+                        className={`absolute top-0 h-3 w-3 ${
+                          isMine
                             ? "-right-1.5 text-[#D9FDD3]"
                             : "-left-1.5 text-white"
-                          }`}
+                        }`}
                       >
                         <svg
                           viewBox="0 0 8 13"
