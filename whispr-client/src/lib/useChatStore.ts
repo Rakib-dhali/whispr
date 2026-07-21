@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { axiosInstance } from "./axioxInstance";
 import toast from "react-hot-toast";
+import { useAuthStore } from "./useAuthStore";
+import { playNotificationSound } from "./keyStrokeSound";
 
 export interface ChatUser {
   _id: string;
@@ -34,6 +36,7 @@ interface ChatStore {
   setSelectedUser: (user: ChatUser | null) => void;
   getMessages: (userId: string) => Promise<void>;
   sendMessage: (userId: string, data: { text?: string; image?: string }) => Promise<void>;
+  subscribeToMessage: () => () => void;
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -87,4 +90,30 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       set({ isSending: false });
     }
   },
+  subscribeToMessage() {
+    const { selectedUser } = get();
+    if (!selectedUser) return () => {};
+
+    const socket = useAuthStore.getState().socket;
+    if (!socket) return () => {};
+
+    socket.off("newMessage");
+
+    socket.on("newMessage", (message) => {
+      const { selectedUser, soundEnabled } = get();
+      if (!selectedUser) return;
+
+      if (message.senderId !== selectedUser._id) return;
+
+      set({ messages: [...get().messages, message] });
+      if (soundEnabled) {
+        playNotificationSound();
+      }
+    });
+
+    return () => {
+      socket.off("newMessage");
+    };
+  },
+
 }));
