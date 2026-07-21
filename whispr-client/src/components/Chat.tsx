@@ -330,6 +330,7 @@ const ChatArea = () => {
     isSending,
     setSelectedUser,
     soundEnabled,
+    subscribeToMessage,
   } = useChatStore();
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -339,6 +340,15 @@ const ChatArea = () => {
   useEffect(() => {
     if (selectedUser) getMessages(selectedUser._id);
   }, [selectedUser, getMessages]);
+
+  useEffect(() => {
+    if (selectedUser) {
+      const unsubscribe = subscribeToMessage();
+      return () => {
+        unsubscribe?.();
+      };
+    }
+  }, [selectedUser, subscribeToMessage]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
