@@ -20,6 +20,7 @@ interface FormErrors {
 const Signup = () => {
   const navigate = useNavigate();
   const setAuthUser = useAuthStore((s) => s.setAuthUser);
+  const {connectSocket} = useAuthStore();
   const [form, setForm] = useState<SignupForm>({
     fullName: "",
     email: "",
@@ -68,6 +69,7 @@ const Signup = () => {
       });
       setAuthUser(res.data.user);
       toast.success("Account created! Welcome to Whispr 🎉");
+      connectSocket()
       navigate("/");
     } catch (error) {
       if (axios.isAxiosError(error)) {

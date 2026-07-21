@@ -18,6 +18,7 @@ interface FormErrors {
 const Login = () => {
   const navigate = useNavigate();
   const setAuthUser = useAuthStore((s) => s.setAuthUser);
+  const {connectSocket} = useAuthStore()
   const [form, setForm] = useState<LoginForm>({
     email: "",
     password: "",
@@ -60,6 +61,7 @@ const Login = () => {
       });
       setAuthUser(res.data.user);
       toast.success("Welcome to Whispr! 🎉");
+      connectSocket();
       navigate("/");
     } catch (error) {
       if (axios.isAxiosError(error)) {

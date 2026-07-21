@@ -22,9 +22,74 @@ import {
 } from "react-icons/hi2";
 import { playKeystrokeSound } from "../lib/keyStrokeSound";
 
+/* ───────────────────── Helpers ───────────────────── */
+const formatLastActive = (dateStr?: string): string => {
+  if (!dateStr) return "offline";
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return "offline";
+
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+  const ampm = hours >= 12 ? "pm" : "am";
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  const minutesStr = minutes < 10 ? "0" + minutes : minutes;
+  const hoursStr = hours < 10 ? "0" + hours : hours;
+  const timeStr = `${hoursStr}:${minutesStr} ${ampm}`;
+
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const startOfYesterday = startOfToday - 86400000;
+  const dateTime = date.getTime();
+
+  if (dateTime >= startOfToday) {
+    return `last active ${timeStr}`;
+  } else if (dateTime >= startOfYesterday) {
+    return `last active yesterday at ${timeStr}`;
+  } else {
+    const options: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
+    const datePart = date.toLocaleDateString([], options);
+    return `last active ${datePart} at ${timeStr}`;
+  }
+};
+
 /* ───────────────────── Main Chat Page ───────────────────── */
 const Chat = () => {
   const { selectedUser } = useChatStore();
+  const { onlineUsers } = useAuthStore();
+  const prevOnlineUsersRef = useRef<string[]>([]);
+
+  useEffect(() => {
+    const prevOnline = prevOnlineUsersRef.current;
+    
+    // Find users who were online but are now offline
+    const wentOffline = prevOnline.filter(id => !onlineUsers.includes(id));
+    
+    if (wentOffline.length > 0) {
+      const nowStr = new Date().toISOString();
+      const { contacts, selectedUser } = useChatStore.getState();
+      
+      const updatedContacts = contacts.map(contact => {
+        if (wentOffline.includes(contact._id)) {
+          return { ...contact, lastActive: nowStr };
+        }
+        return contact;
+      });
+      
+      const hasChanged = contacts.some(contact => wentOffline.includes(contact._id));
+      if (hasChanged) {
+        useChatStore.setState({ contacts: updatedContacts });
+      }
+
+      if (selectedUser && wentOffline.includes(selectedUser._id)) {
+        useChatStore.setState({
+          selectedUser: { ...selectedUser, lastActive: nowStr }
+        });
+      }
+    }
+
+    prevOnlineUsersRef.current = onlineUsers;
+  }, [onlineUsers]);
 
   return (
     <div className="flex h-screen w-full bg-[#EDE7DD] overflow-hidden">
@@ -42,7 +107,7 @@ export default Chat;
 
 /* ───────────────────── Sidebar ───────────────────── */
 const Sidebar = () => {
-  const { authUser, logout } = useAuthStore();
+  const { authUser, logout, onlineUsers } = useAuthStore();
   const {
     contacts,
     isContactsLoading,
@@ -182,6 +247,7 @@ const Sidebar = () => {
               isSelected={selectedUser?._id === contact._id}
               onSelect={() => setSelectedUser(contact)}
               getInitials={getInitials}
+              isOnline={onlineUsers.includes(contact._id)}
             />
           ))
         )}
@@ -196,6 +262,7 @@ interface ContactItemProps {
   isSelected: boolean;
   onSelect: () => void;
   getInitials: (name: string) => string;
+  isOnline: boolean;
 }
 
 const ContactItem = ({
@@ -203,6 +270,7 @@ const ContactItem = ({
   isSelected,
   onSelect,
   getInitials,
+  isOnline,
 }: ContactItemProps) => (
   <button
     onClick={onSelect}
@@ -212,29 +280,36 @@ const ContactItem = ({
         : "hover:bg-[#FAFAF5] border-l-4 border-transparent"
     }`}
   >
-    {contact.profilePic ? (
-      <img
-        src={contact.profilePic}
-        alt={contact.fullName}
-        className="h-12 w-12 rounded-full object-cover"
-      />
-    ) : (
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-[#22C55E] to-[#0F3D2E] text-sm font-bold text-white">
-        {getInitials(contact.fullName)}
-      </div>
-    )}
+    <div className="relative shrink-0">
+      {contact.profilePic ? (
+        <img
+          src={contact.profilePic}
+          alt={contact.fullName}
+          className="h-12 w-12 rounded-full object-cover"
+        />
+      ) : (
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-[#22C55E] to-[#0F3D2E] text-sm font-bold text-white">
+          {getInitials(contact.fullName)}
+        </div>
+      )}
+      {isOnline && (
+        <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-[#22C55E]" />
+      )}
+    </div>
     <div className="flex-1 text-left min-w-0">
       <p className="text-sm font-semibold text-[#1a1a1a] truncate">
         {contact.fullName}
       </p>
-      <p className="text-xs text-[#8a8a85] truncate">{contact.email}</p>
+      <p className={`text-xs truncate ${isOnline ? "text-[#22C55E]" : "text-[#8a8a85]"}`}>
+        {isOnline ? "online" : "offline"}
+      </p>
     </div>
   </button>
 );
 
 /* ───────────────────── Chat Area ───────────────────── */
 const ChatArea = () => {
-  const { authUser } = useAuthStore();
+  const { authUser, onlineUsers } = useAuthStore();
   const {
     selectedUser,
     messages,
@@ -331,22 +406,33 @@ const ChatArea = () => {
       {/* Chat header */}
       <div className="flex items-center justify-between border-b border-[#d8d1c3] bg-[#F6F0E8] px-4 py-2.5">
         <div className="flex items-center gap-3">
-          {selectedUser?.profilePic ? (
-            <img
-              src={selectedUser.profilePic}
-              alt={selectedUser.fullName}
-              className="h-10 w-10 rounded-full object-cover"
-            />
-          ) : (
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-[#22C55E] to-[#0F3D2E] text-sm font-bold text-white">
-              {selectedUser ? getInitials(selectedUser.fullName) : "?"}
-            </div>
-          )}
+          <div className="relative shrink-0">
+            {selectedUser?.profilePic ? (
+              <img
+                src={selectedUser.profilePic}
+                alt={selectedUser.fullName}
+                className="h-10 w-10 rounded-full object-cover"
+              />
+            ) : (
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-[#22C55E] to-[#0F3D2E] text-sm font-bold text-white">
+                {selectedUser ? getInitials(selectedUser.fullName) : "?"}
+              </div>
+            )}
+            {selectedUser && onlineUsers.includes(selectedUser._id) && (
+              <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[#F6F0E8] bg-[#22C55E]" />
+            )}
+          </div>
           <div>
             <p className="text-sm font-semibold text-[#1a1a1a]">
               {selectedUser?.fullName}
             </p>
-            <p className="text-xs text-[#22C55E]">online</p>
+            {selectedUser && onlineUsers.includes(selectedUser._id) ? (
+              <p className="text-xs text-[#22C55E]">online</p>
+            ) : (
+              <p className="text-xs text-[#8a8a85]">
+                {formatLastActive(selectedUser?.lastActive)}
+              </p>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-1">
