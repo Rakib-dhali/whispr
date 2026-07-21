@@ -16,7 +16,7 @@ const io = new Server(server, {
 
 io.use(socketIoMiddleware);
 
-const userSocketMap = {};
+const userSocketMap = {}; // { userId: string[] }
 
 export function getReceiverSocketId(userId) {
   return userSocketMap[userId];
@@ -26,21 +26,31 @@ io.on("connection", (socket) => {
   console.log("A user connected:", socket.user.fullName);
 
   const userId = socket.user._id.toString();
-  userSocketMap[userId] = socket.id;
-
+  if (!userSocketMap[userId]) {
+    userSocketMap[userId] = [];
+  }
+  userSocketMap[userId].push(socket.id);
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
   socket.on("disconnect", async () => {
     console.log("A user disconnected:", socket.user.fullName);
-    delete userSocketMap[userId];
+    
+    const userSockets = userSocketMap[userId];
+    if (userSockets) {
+      userSocketMap[userId] = userSockets.filter((id) => id !== socket.id);
+      if (userSocketMap[userId].length === 0) {
+        delete userSocketMap[userId];
+        
+        // Persist last active time to DB only when all connections are closed
+        try {
+          await User.findByIdAndUpdate(userId, { lastActive: new Date() });
+        } catch (err) {
+          console.error("Failed to update lastActive:", err);
+        }
+      }
+    }
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
-    // Persist last active time to DB
-    try {
-      await User.findByIdAndUpdate(userId, { lastActive: new Date() });
-    } catch (err) {
-      console.error("Failed to update lastActive:", err);
-    }
   });
 });
 

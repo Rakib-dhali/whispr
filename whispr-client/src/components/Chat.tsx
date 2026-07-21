@@ -28,18 +28,22 @@ const formatLastActive = (dateStr?: string): string => {
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return "offline";
 
-  let hours = date.getHours();
-  const minutes = date.getMinutes();
-  const ampm = hours >= 12 ? "pm" : "am";
-  hours = hours % 12;
-  hours = hours ? hours : 12; // the hour '0' should be '12'
-  const minutesStr = minutes < 10 ? "0" + minutes : minutes;
-  const hoursStr = hours < 10 ? "0" + hours : hours;
-  const timeStr = `${hoursStr}:${minutesStr} ${ampm}`;
+  const timeStr = date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
   const now = new Date();
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  const startOfYesterday = startOfToday - 86400000;
+  const startOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+  ).getTime();
+  const startOfYesterday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() - 1,
+  ).getTime();
   const dateTime = date.getTime();
 
   if (dateTime >= startOfToday) {
@@ -47,7 +51,10 @@ const formatLastActive = (dateStr?: string): string => {
   } else if (dateTime >= startOfYesterday) {
     return `last active yesterday at ${timeStr}`;
   } else {
-    const options: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
+    const options: Intl.DateTimeFormatOptions = {
+      month: "short",
+      day: "numeric",
+    };
     const datePart = date.toLocaleDateString([], options);
     return `last active ${datePart} at ${timeStr}`;
   }
@@ -61,29 +68,31 @@ const Chat = () => {
 
   useEffect(() => {
     const prevOnline = prevOnlineUsersRef.current;
-    
+
     // Find users who were online but are now offline
-    const wentOffline = prevOnline.filter(id => !onlineUsers.includes(id));
-    
+    const wentOffline = prevOnline.filter((id) => !onlineUsers.includes(id));
+
     if (wentOffline.length > 0) {
       const nowStr = new Date().toISOString();
       const { contacts, selectedUser } = useChatStore.getState();
-      
-      const updatedContacts = contacts.map(contact => {
+
+      const updatedContacts = contacts.map((contact) => {
         if (wentOffline.includes(contact._id)) {
           return { ...contact, lastActive: nowStr };
         }
         return contact;
       });
-      
-      const hasChanged = contacts.some(contact => wentOffline.includes(contact._id));
+
+      const hasChanged = contacts.some((contact) =>
+        wentOffline.includes(contact._id),
+      );
       if (hasChanged) {
         useChatStore.setState({ contacts: updatedContacts });
       }
 
       if (selectedUser && wentOffline.includes(selectedUser._id)) {
         useChatStore.setState({
-          selectedUser: { ...selectedUser, lastActive: nowStr }
+          selectedUser: { ...selectedUser, lastActive: nowStr },
         });
       }
     }
@@ -300,7 +309,9 @@ const ContactItem = ({
       <p className="text-sm font-semibold text-[#1a1a1a] truncate">
         {contact.fullName}
       </p>
-      <p className={`text-xs truncate ${isOnline ? "text-[#22C55E]" : "text-[#8a8a85]"}`}>
+      <p
+        className={`text-xs truncate ${isOnline ? "text-[#22C55E]" : "text-[#8a8a85]"}`}
+      >
         {isOnline ? "online" : "offline"}
       </p>
     </div>

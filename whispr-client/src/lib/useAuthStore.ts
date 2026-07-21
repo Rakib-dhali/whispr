@@ -22,9 +22,10 @@ interface StoreItems {
   disconnectSocket: () => void;
 }
 
-const baseUrl = import.meta.env.MODE === "development"? "http://localhost:3000" : "/";
+const baseUrl =
+  import.meta.env.MODE === "development" ? "http://localhost:3000" : "/";
 
-export const useAuthStore = create<StoreItems>(( set, get) => ({
+export const useAuthStore = create<StoreItems>((set, get) => ({
   authUser: null,
   isCheckingAuth: true,
   setAuthUser: (user) => set({ authUser: user }),
@@ -35,7 +36,7 @@ export const useAuthStore = create<StoreItems>(( set, get) => ({
     try {
       const res = await axiosInstance.get("/auth/checkUser");
       set({ authUser: res.data.user });
-      get().connectSocket()
+      get().connectSocket();
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
@@ -73,24 +74,22 @@ export const useAuthStore = create<StoreItems>(( set, get) => ({
       }
     }
   },
-  connectSocket: () =>{
-    const {authUser} = get();
-    if(!authUser || get().socket?.connected) return;
+  connectSocket: () => {
+    const { authUser } = get();
+    if (!authUser || get().socket?.connected) return;
 
     const socket = io(`${baseUrl}`, {
-      withCredentials: true
+      withCredentials: true,
     });
 
-    socket.connect()
-    set({socket}) 
-    
-    socket.on("getOnlineUsers", (userIds: string[]) =>{
-      set({onlineUsers: userIds})
-    })
+    set({ socket });
+
+    socket.on("getOnlineUsers", (userIds: string[]) => {
+      set({ onlineUsers: userIds });
+    });
   },
-  disconnectSocket: ()=>{
-    if(get().socket?.connected) {
-      get().socket?.disconnect();
-    }
+  disconnectSocket: () => {
+    get().socket?.disconnect();
+    set({ socket: null, onlineUsers: [] });
   },
 }));
