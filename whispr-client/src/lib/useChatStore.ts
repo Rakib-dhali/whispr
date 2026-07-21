@@ -7,6 +7,7 @@ export interface ChatUser {
   fullName: string;
   email: string;
   profilePic?: string;
+  lastActive?: string;
 }
 
 export interface Message {
