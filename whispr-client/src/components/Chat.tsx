@@ -5,6 +5,7 @@ import {
   type SubmitEvent,
   type ChangeEvent,
 } from "react";
+import { motion } from "motion/react";
 import { useAuthStore } from "../lib/useAuthStore";
 import { useChatStore, type ChatUser, type Message } from "../lib/useChatStore";
 import {
@@ -281,7 +282,10 @@ const ContactItem = ({
   getInitials,
   isOnline,
 }: ContactItemProps) => (
-  <button
+  <motion.button
+    initial={{ opacity: 0, x: -20 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.3 }}
     onClick={onSelect}
     className={`flex w-full cursor-pointer items-center gap-3 px-4 py-3 transition-colors ${
       isSelected
@@ -315,7 +319,7 @@ const ContactItem = ({
         {isOnline ? "online" : "offline"}
       </p>
     </div>
-  </button>
+  </motion.button>
 );
 
 /* ───────────────────── Chat Area ───────────────────── */
@@ -516,8 +520,11 @@ const ChatArea = () => {
               {group.messages.map((msg) => {
                 const isMine = msg.senderId === authUser?._id;
                 return (
-                  <div
+                  <motion.div
                     key={msg._id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    layout
                     className={`mb-1.5 flex ${isMine ? "justify-end" : "justify-start"}`}
                   >
                     <div
@@ -577,7 +584,7 @@ const ChatArea = () => {
                         )}
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
@@ -679,7 +686,12 @@ const ChatArea = () => {
 
 /* ───────────────────── No Chat Selected Placeholder ───────────────────── */
 const NoChatSelected = () => (
-  <div className="flex flex-1 flex-col items-center justify-center bg-[#EDE7DD] px-8 text-center">
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.5 }}
+    className="flex flex-1 flex-col items-center justify-center bg-[#EDE7DD] px-8 text-center"
+  >
     <div className="relative mb-6">
       {/* Animated rings */}
       <div className="absolute inset-0 flex items-center justify-center">
@@ -761,5 +773,5 @@ const NoChatSelected = () => (
         <span className="text-xs text-[#6b6b64]">Secure</span>
       </div>
     </div>
-  </div>
+  </motion.div>
 );

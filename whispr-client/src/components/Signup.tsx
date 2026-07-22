@@ -4,6 +4,7 @@ import { axiosInstance } from "../lib/axioxInstance";
 import { useAuthStore } from "../lib/useAuthStore";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 
 interface SignupForm {
   fullName: string;
@@ -95,7 +96,12 @@ const Signup = () => {
     <div className="min-h-screen w-full bg-[#FBF4EC] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         {/* Card */}
-        <div className="rounded-2xl border border-[#E4DCCF] bg-white px-8 py-10 shadow-sm">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="rounded-2xl border border-[#E4DCCF] bg-white px-8 py-10 shadow-sm"
+        >
           <div className="text-center pb-10">
             <h2 className="text-2xl font-bold text-[#1a1a1a] pb-3">
               Create New Account
@@ -249,7 +255,7 @@ const Signup = () => {
               Log in
             </Link>
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

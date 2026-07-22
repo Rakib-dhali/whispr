@@ -12,6 +12,7 @@ import { FaGithub, FaDiscord } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import type React from "react";
+import { motion } from "framer-motion";
 
 const WhisprLandingPage: React.FC =  () => {
   return (
@@ -32,7 +33,12 @@ export default WhisprLandingPage;
 const NavBar: React.FC = () => {
   const links = ["Features", "Pricing", "Safety"];
   return (
-    <header className="w-full bg-[#FBF4EC]">
+    <motion.header 
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="w-full bg-[#FBF4EC]"
+    >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
         <div className="flex items-center gap-2">
           <HiOutlineChatBubbleLeftRight className="h-5 w-5 text-[#0F3D2E]" />
@@ -66,7 +72,7 @@ const NavBar: React.FC = () => {
           </Link>
         </div>
       </div>
-    </header>
+    </motion.header>
   );
 };
 
@@ -133,7 +139,13 @@ const ChatPreview: React.FC = () => {
 const Hero: React.FC = () => {
   return (
     <section className="bg-[#FBF4EC]">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-6 py-16 md:grid-cols-2 md:py-24">
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-6 py-16 md:grid-cols-2 md:py-24"
+      >
         <div>
           <h1 className="text-5xl font-extrabold leading-tight text-[#0F3D2E] sm:text-6xl">
             Private. Fast.
@@ -163,7 +175,7 @@ const Hero: React.FC = () => {
         </div>
 
         <ChatPreview />
-      </div>
+      </motion.div>
     </section>
   );
 };
@@ -203,7 +215,12 @@ const FeaturesSection: React.FC = () => {
   return (
     <section className="bg-[#EDE7DD]">
       <div className="mx-auto max-w-6xl px-6 py-20">
-        <div className="mx-auto max-w-xl text-center">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mx-auto max-w-xl text-center"
+        >
           <h2 className="text-3xl font-extrabold text-[#0F3D2E] sm:text-4xl">
             Communication Redefined
           </h2>
@@ -211,12 +228,16 @@ const FeaturesSection: React.FC = () => {
             Whispr provides a robust set of features designed to make your daily
             interactions safe and efficient.
           </p>
-        </div>
+        </motion.div>
 
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
-          {features.map((feature) => (
-            <div
+          {features.map((feature, i) => (
+            <motion.div
               key={feature.title}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1, duration: 0.5 }}
               className="rounded-2xl bg-white p-6 shadow-sm"
             >
               <div
@@ -230,7 +251,7 @@ const FeaturesSection: React.FC = () => {
               <p className="mt-2 text-sm leading-relaxed text-[#6b6b64]">
                 {feature.description}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -268,7 +289,13 @@ const SeamlessConnectionSection: React.FC = () => {
 
   return (
     <section className="bg-[#FBF4EC]">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-6 py-20 md:grid-cols-2">
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.7 }}
+        className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-6 py-20 md:grid-cols-2"
+      >
         <div className="overflow-hidden rounded-2xl border-2 border-[#22C55E] p-2">
           <img
             src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=900&q=80"
@@ -304,7 +331,7 @@ const SeamlessConnectionSection: React.FC = () => {
             ))}
           </ul>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };
@@ -312,7 +339,13 @@ const SeamlessConnectionSection: React.FC = () => {
 const TestimonialSection: React.FC = () => {
   return (
     <section className="bg-[#0F3D2E]">
-      <div className="mx-auto max-w-3xl px-6 py-20 text-center">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="mx-auto max-w-3xl px-6 py-20 text-center"
+      >
         <span className="text-4xl font-serif text-[#22C55E]">&rdquo;</span>
         <p className="mt-2 text-xl font-medium leading-relaxed text-white sm:text-2xl">
           &ldquo;Whispr has completely transformed how our remote team
@@ -331,7 +364,7 @@ const TestimonialSection: React.FC = () => {
             <p className="text-xs text-[#a9c9bb]">CTO at InnovateGlobal</p>
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };
@@ -340,7 +373,13 @@ const CTASection: React.FC = () => {
   return (
     <section className="bg-[#FBF4EC]">
       <div className="mx-auto max-w-6xl px-6 py-20">
-        <div className="mx-auto max-w-2xl rounded-2xl bg-[#E6DFD3] px-8 py-14 text-center">
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, type: "spring", bounce: 0.4 }}
+          className="mx-auto max-w-2xl rounded-2xl bg-[#E6DFD3] px-8 py-14 text-center"
+        >
           <h2 className="text-2xl font-extrabold text-[#0F3D2E] sm:text-3xl">
             Ready to join the conversation?
           </h2>
@@ -367,7 +406,7 @@ const CTASection: React.FC = () => {
           <p className="mt-4 text-xs text-[#8a8a82]">
             No credit card required. Free forever for individuals.
           </p>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

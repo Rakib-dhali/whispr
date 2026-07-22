@@ -4,6 +4,7 @@ import { axiosInstance } from "../lib/axioxInstance";
 import { useAuthStore } from "../lib/useAuthStore";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 
 interface LoginForm {
   email: string;
@@ -18,7 +19,7 @@ interface FormErrors {
 const Login = () => {
   const navigate = useNavigate();
   const setAuthUser = useAuthStore((s) => s.setAuthUser);
-  const {connectSocket} = useAuthStore()
+  const { connectSocket } = useAuthStore();
   const [form, setForm] = useState<LoginForm>({
     email: "",
     password: "",
@@ -87,7 +88,20 @@ const Login = () => {
     <div className="min-h-screen w-full bg-[#FBF4EC] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         {/* Card */}
-        <div className="rounded-2xl border border-[#E4DCCF] bg-white px-8 py-10 shadow-sm">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="rounded-2xl border border-[#E4DCCF] bg-white px-8 py-10 shadow-sm"
+        >
+          {/* Header */}
+          <div className="mb-8 text-center">
+            <h1 className="text-2xl font-bold text-[#1a1a1a]">Welcome Back</h1>
+            <p className="mt-2 text-sm text-[#6b6b64]">
+              Log in to your Whispr account
+            </p>
+          </div>
+
           <form
             id="login-form"
             onSubmit={handleSubmit}
@@ -189,7 +203,7 @@ const Login = () => {
               Sign up
             </Link>
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
