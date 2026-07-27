@@ -8,16 +8,19 @@ interface AuthUser {
   _id: string;
   fullName: string;
   email: string;
+  profilePic?: string;
   profilepic?: string;
 }
 interface StoreItems {
   authUser: AuthUser | null;
   isCheckingAuth: boolean;
+  isUpdatingProfile: boolean;
   socket: ReturnType<typeof io> | null;
   onlineUsers: string[];
   checkAuth: () => void;
   setAuthUser: (user: AuthUser | null) => void;
   logout: () => Promise<void>;
+  updateProfile: (data: { fullName?: string; profilePic?: string }) => Promise<boolean>;
   connectSocket: () => void;
   disconnectSocket: () => void;
 }
@@ -28,6 +31,7 @@ const baseUrl =
 export const useAuthStore = create<StoreItems>((set, get) => ({
   authUser: null,
   isCheckingAuth: true,
+  isUpdatingProfile: false,
   setAuthUser: (user) => set({ authUser: user }),
   socket: null,
   onlineUsers: [],
@@ -55,6 +59,27 @@ export const useAuthStore = create<StoreItems>((set, get) => ({
       set({ authUser: null });
     } finally {
       set({ isCheckingAuth: false });
+    }
+  },
+
+  updateProfile: async (data) => {
+    set({ isUpdatingProfile: true });
+    try {
+      const res = await axiosInstance.patch("/auth/update-profile", data);
+      set({ authUser: res.data.user });
+      toast.success("Profile updated successfully! ✨");
+      return true;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const message =
+          error.response?.data?.message || "Profile update failed.";
+        toast.error(message);
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
+      return false;
+    } finally {
+      set({ isUpdatingProfile: false });
     }
   },
 

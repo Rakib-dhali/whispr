@@ -1,12 +1,20 @@
 <div align="center">
 
+<img src="./whispr-client/public/logo.png" alt="Whispr Logo" width="120" style="border-radius: 20px;" />
+
 # Whispr 💬⚡
 
 > **Whispr** is a modern, ultra-fast, and secure full-stack real-time web chat application engineered with Node.js, Express, Socket.io, MongoDB, React 19, TypeScript, and Zustand. 
 
-![Whispr Banner](https://img.shields.io/badge/Whispr-Real--time%20Chat-0F3D2E?style=for-the-badge&logo=chat)
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-whispr--7h13.onrender.com-22C55E?style=for-the-badge&logo=render&logoColor=white)](https://whispr-7h13.onrender.com/)
+
+> 🚀 **Live Demo:** [https://whispr-7h13.onrender.com/](https://whispr-7h13.onrender.com/)  
+> ⏳ *Note: Deployed on Render free tier. If the instance is idle, the initial load may take 30–50 seconds while the backend container wakes up.*
+
+<br/>
+
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.x-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=node.js)](https://nodejs.org/)
 [![Socket.io](https://img.shields.io/badge/Socket.io-4.x-010101?style=for-the-badge&logo=socket.io)](https://socket.io/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)

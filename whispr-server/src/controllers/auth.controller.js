@@ -48,6 +48,8 @@ export const signup = async (req, res) => {
           _id: user._id,
           fullName: user.fullName,
           email: user.email,
+          profilePic: user.profilePic || "",
+          profilepic: user.profilePic || "",
         },
       });
     } else {
@@ -95,6 +97,8 @@ export const signin = async (req, res) => {
         _id: user._id,
         fullName: user.fullName,
         email: user.email,
+        profilePic: user.profilePic || "",
+        profilepic: user.profilePic || "",
       },
     });
   } catch (error) {
@@ -170,6 +174,7 @@ export const checkUser = async (req, res) => {
         fullName: req.user.fullName,
         email: req.user.email,
         profilePic: req.user.profilePic,
+        profilepic: req.user.profilePic,
       },
     });
   } catch (error) {

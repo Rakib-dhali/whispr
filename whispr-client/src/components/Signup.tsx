@@ -102,8 +102,9 @@ const Signup = () => {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="rounded-2xl border border-[#E4DCCF] bg-white px-8 py-10 shadow-sm"
         >
-          <div className="text-center pb-10">
-            <h2 className="text-2xl font-bold text-[#1a1a1a] pb-3">
+          <div className="text-center pb-8 flex flex-col items-center">
+            <img src="/logo.png" alt="Whispr Logo" className="mb-3 h-14 w-14 rounded-2xl shadow-md object-contain" />
+            <h2 className="text-2xl font-bold text-[#1a1a1a] pb-2">
               Create New Account
             </h2>
             <p className="text-xs text-[#6b6b64]">

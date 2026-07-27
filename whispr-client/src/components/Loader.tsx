@@ -1,13 +1,12 @@
 import { motion } from "motion/react";
-import { HiOutlineChatBubbleLeftRight } from "react-icons/hi2";
 
 const Loader = () => {
   return (
     <div className="flex h-screen w-full flex-col items-center justify-center bg-[#FBF4EC]">
       <motion.div
         animate={{
-          scale: [1, 1.1, 1],
-          opacity: [0.7, 1, 0.7],
+          scale: [1, 1.08, 1],
+          opacity: [0.8, 1, 0.8],
         }}
         transition={{
           duration: 1.5,
@@ -16,9 +15,11 @@ const Loader = () => {
         }}
         className="flex flex-col items-center gap-4"
       >
-        <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-br from-[#22C55E] to-[#0F3D2E] shadow-xl shadow-[#22C55E]/20">
-          <HiOutlineChatBubbleLeftRight className="h-12 w-12 text-white" />
-        </div>
+        <img
+          src="/logo.png"
+          alt="Whispr Logo"
+          className="h-20 w-20 rounded-2xl shadow-xl shadow-[#22C55E]/25 object-contain"
+        />
         <p className="text-sm font-bold tracking-widest text-[#0F3D2E]">
           WHISPR
         </p>

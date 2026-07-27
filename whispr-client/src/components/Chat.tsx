@@ -8,6 +8,7 @@ import {
 import { motion } from "motion/react";
 import { useAuthStore } from "../lib/useAuthStore";
 import { useChatStore, type ChatUser, type Message } from "../lib/useChatStore";
+import toast from "react-hot-toast";
 import {
   HiOutlineChatBubbleLeftRight,
   HiMagnifyingGlass,
@@ -20,6 +21,8 @@ import {
   HiUser,
   HiSpeakerWave,
   HiSpeakerXMark,
+  HiCamera,
+  HiUserCircle,
 } from "react-icons/hi2";
 import { playKeystrokeSound } from "../lib/keyStrokeSound";
 
@@ -115,6 +118,194 @@ const Chat = () => {
 
 export default Chat;
 
+/* ───────────────────── Profile Modal ───────────────────── */
+interface ProfileModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
+  const { authUser, updateProfile, isUpdatingProfile } = useAuthStore();
+  const [fullName, setFullName] = useState(authUser?.fullName || "");
+  const [prevAuthName, setPrevAuthName] = useState(authUser?.fullName);
+  const [selectedImg, setSelectedImg] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Adjust state during render if authUser changes (React 19 recommended pattern)
+  if (authUser?.fullName !== prevAuthName) {
+    setPrevAuthName(authUser?.fullName);
+    setFullName(authUser?.fullName || "");
+  }
+
+  if (!isOpen) return null;
+
+  const currentAvatar = selectedImg || authUser?.profilePic || authUser?.profilepic;
+
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size must be less than 5MB");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setSelectedImg(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const hasNameChanged = fullName.trim() !== authUser?.fullName;
+    const hasImageChanged = selectedImg !== null;
+
+    if (!hasNameChanged && !hasImageChanged) {
+      onClose();
+      return;
+    }
+
+    const success = await updateProfile({
+      fullName: hasNameChanged ? fullName.trim() : undefined,
+      profilePic: hasImageChanged ? selectedImg : undefined,
+    });
+
+    if (success) {
+      setSelectedImg(null);
+      onClose();
+    }
+  };
+
+  const getInitials = (name: string) =>
+    name
+      .split(" ")
+      .map((w) => w[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+        className="w-full max-w-md rounded-2xl border border-[#E4DCCF] bg-white p-6 shadow-xl"
+      >
+        <div className="flex items-center justify-between border-b border-[#EDE7DD] pb-4">
+          <h3 className="text-lg font-bold text-[#1a1a1a]">Update Profile</h3>
+          <button
+            onClick={onClose}
+            className="rounded-full p-1.5 text-[#6b6b64] hover:bg-[#F4F1EA] transition-colors cursor-pointer"
+          >
+            <HiXMark className="h-5 w-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+          {/* Avatar Upload */}
+          <div className="flex flex-col items-center">
+            <div className="relative group">
+              {currentAvatar ? (
+                <img
+                  src={currentAvatar}
+                  alt="Profile Avatar"
+                  className="h-24 w-24 rounded-full object-cover border-2 border-[#22C55E]"
+                />
+              ) : (
+                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-[#0F3D2E] text-2xl font-bold text-white border-2 border-[#22C55E]">
+                  {authUser?.fullName ? getInitials(authUser.fullName) : "?"}
+                </div>
+              )}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageChange}
+                accept="image/*"
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-[#22C55E] text-white shadow-md hover:bg-[#1ea852] transition-colors cursor-pointer"
+                title="Change Avatar"
+              >
+                <HiCamera className="h-4 w-4" />
+              </button>
+            </div>
+            <p className="mt-2 text-xs text-[#8a8a85]">
+              Click the camera icon to upload a photo (max 5MB)
+            </p>
+          </div>
+
+          {/* Full Name */}
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[#6b6b64]">
+              Full Name
+            </label>
+            <input
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Your Full Name"
+              required
+              className="w-full rounded-xl border border-[#E4DCCF] bg-[#F4F1EA] px-4 py-2.5 text-sm text-[#1a1a1a] outline-none focus:border-[#22C55E] focus:ring-2 focus:ring-[#22C55E]/20 transition-all"
+            />
+          </div>
+
+          {/* Email (Read-only) */}
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[#6b6b64]">
+              Email Address
+            </label>
+            <input
+              type="email"
+              value={authUser?.email || ""}
+              disabled
+              className="w-full rounded-xl border border-[#E4DCCF] bg-[#e8e4db] px-4 py-2.5 text-sm text-[#6b6b64] cursor-not-allowed outline-none"
+            />
+          </div>
+
+          {/* Buttons */}
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-xl border border-[#E4DCCF] px-4 py-2.5 text-sm font-semibold text-[#6b6b64] hover:bg-[#F4F1EA] transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isUpdatingProfile}
+              className="flex items-center justify-center gap-2 rounded-xl bg-[#22C55E] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1ea852] active:scale-95 disabled:opacity-50 transition-all cursor-pointer"
+            >
+              {isUpdatingProfile ? (
+                <>
+                  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                  Saving…
+                </>
+              ) : (
+                "Save Changes"
+              )}
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </div>
+  );
+};
+
 /* ───────────────────── Sidebar ───────────────────── */
 const Sidebar = () => {
   const { authUser, logout, onlineUsers } = useAuthStore();
@@ -129,6 +320,7 @@ const Sidebar = () => {
   } = useChatStore();
   const [search, setSearch] = useState("");
   const [showMenu, setShowMenu] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   useEffect(() => {
     getContacts();
@@ -146,6 +338,8 @@ const Sidebar = () => {
       .toUpperCase()
       .slice(0, 2);
 
+  const userAvatar = authUser?.profilePic || authUser?.profilepic;
+
   return (
     <aside
       className={`flex h-full flex-col border-r border-[#d8d1c3] bg-white w-full md:w-95 md:min-w-[320px] ${selectedUser ? "hidden md:flex" : "flex"}`}
@@ -153,9 +347,9 @@ const Sidebar = () => {
       {/* Sidebar header */}
       <div className="flex items-center justify-between px-4 py-3 bg-[#F6F0E8]">
         <div className="flex items-center gap-3">
-          {authUser?.profilepic ? (
+          {userAvatar ? (
             <img
-              src={authUser.profilepic}
+              src={userAvatar}
               alt={authUser.fullName}
               className="h-10 w-10 rounded-full object-cover"
             />
@@ -202,6 +396,17 @@ const Sidebar = () => {
               <div className="absolute right-0 top-full z-20 mt-1 w-48 rounded-xl border border-[#E4DCCF] bg-white py-1.5 shadow-lg animate-in fade-in slide-in-from-top-1">
                 <button
                   onClick={() => {
+                    setShowMenu(false);
+                    setShowProfileModal(true);
+                  }}
+                  className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-[#1a1a1a] hover:bg-[#F4F1EA] transition-colors cursor-pointer"
+                >
+                  <HiUserCircle className="h-4 w-4 text-[#6b6b64]" />
+                  Profile
+                </button>
+                <div className="my-1 h-px bg-[#EDE7DD]" />
+                <button
+                  onClick={() => {
                     logout();
                     setShowMenu(false);
                   }}
@@ -215,6 +420,11 @@ const Sidebar = () => {
           )}
         </div>
       </div>
+
+      <ProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+      />
 
       {/* Search */}
       <div className="px-3 py-2">
@@ -706,9 +916,11 @@ const NoChatSelected = () => (
           style={{ animationDuration: "2s" }}
         />
       </div>
-      <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-br from-[#22C55E] to-[#0F3D2E] shadow-lg shadow-[#22C55E]/20">
-        <HiOutlineChatBubbleLeftRight className="h-12 w-12 text-white" />
-      </div>
+      <img
+        src="/logo.png"
+        alt="Whispr Logo"
+        className="relative h-20 w-20 rounded-2xl shadow-lg shadow-[#22C55E]/20 object-contain"
+      />
     </div>
 
     <h2 className="text-2xl font-bold text-[#0F3D2E]">Welcome to Whispr</h2>

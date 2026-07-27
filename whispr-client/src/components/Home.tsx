@@ -1,5 +1,4 @@
 import {
-  HiOutlineChatBubbleLeftRight,
   HiOutlineLockClosed,
   HiOutlineBolt,
   HiOutlinePhoto,
@@ -40,9 +39,9 @@ const NavBar: React.FC = () => {
       className="w-full bg-[#FBF4EC]"
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-        <div className="flex items-center gap-2">
-          <HiOutlineChatBubbleLeftRight className="h-5 w-5 text-[#0F3D2E]" />
-          <span className="text-lg font-bold text-[#0F3D2E]">Whispr</span>
+        <div className="flex items-center gap-2.5">
+          <img src="/logo.png" alt="Whispr Logo" className="h-8 w-8 rounded-lg object-contain shadow-xs" />
+          <span className="text-xl font-bold text-[#0F3D2E]">Whispr</span>
         </div>
 
         <nav className="hidden items-center gap-8 text-sm text-[#4B4B46] md:flex">
@@ -430,8 +429,8 @@ const Footer: React.FC = () => {
       <div className="mx-auto max-w-6xl px-6 py-14">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-4">
           <div>
-            <div className="flex items-center gap-2">
-              <HiOutlineChatBubbleLeftRight className="h-5 w-5 text-[#0F3D2E]" />
+            <div className="flex items-center gap-2.5">
+              <img src="/logo.png" alt="Whispr Logo" className="h-7 w-7 rounded-md object-contain" />
               <span className="text-lg font-bold text-[#0F3D2E]">Whispr</span>
             </div>
             <p className="mt-3 max-w-55 text-sm text-[#6b6b64]">

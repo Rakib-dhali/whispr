@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="./public/logo.png" alt="Whispr Logo" width="100" style="border-radius: 16px;" />
+
 # Whispr Client 🎨📱
 
 > **whispr-client** is the frontend application for Whispr, built with React 19, TypeScript, Vite, Tailwind CSS v4, and Zustand. It provides a real-time messaging user interface with audio feedback, image preview uploads, online presence indicators, and a seamless chat experience across desktop and mobile browsers.

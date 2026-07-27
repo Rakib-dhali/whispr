@@ -95,7 +95,8 @@ const Login = () => {
           className="rounded-2xl border border-[#E4DCCF] bg-white px-8 py-10 shadow-sm"
         >
           {/* Header */}
-          <div className="mb-8 text-center">
+          <div className="mb-8 text-center flex flex-col items-center">
+            <img src="/logo.png" alt="Whispr Logo" className="mb-3 h-14 w-14 rounded-2xl shadow-md object-contain" />
             <h1 className="text-2xl font-bold text-[#1a1a1a]">Welcome Back</h1>
             <p className="mt-2 text-sm text-[#6b6b64]">
               Log in to your Whispr account
